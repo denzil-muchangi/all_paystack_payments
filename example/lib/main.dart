@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:all_paystack_payments/all_paystack_payments.dart';
+
+import 'l10n/app_localizations.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,6 +21,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _isInitialized = false;
   String _statusMessage = '';
+  Locale _currentLocale = const Locale('en');
 
   @override
   void initState() {
@@ -31,11 +35,13 @@ class _MyAppState extends State<MyApp> {
       await AllPaystackPayments.initialize('pk_test_your_test_public_key_here');
       setState(() {
         _isInitialized = true;
-        _statusMessage = 'Paystack initialized successfully';
+        _statusMessage = AppLocalizations.of(context)!.paystackInitialized;
       });
     } catch (e) {
       setState(() {
-        _statusMessage = 'Failed to initialize Paystack: $e';
+        _statusMessage = AppLocalizations.of(
+          context,
+        )!.paystackInitFailed(e.toString());
       });
     }
   }
@@ -49,7 +55,7 @@ class _MyAppState extends State<MyApp> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
         ],
       ),
@@ -76,7 +82,7 @@ class _MyAppState extends State<MyApp> {
     final amountController = TextEditingController();
 
     _showPaymentDialog(
-      'Card Payment',
+      AppLocalizations.of(context)!.cardPayment,
       Form(
         key: formKey,
         child: SingleChildScrollView(
@@ -85,65 +91,80 @@ class _MyAppState extends State<MyApp> {
             children: [
               TextFormField(
                 controller: emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Required' : null,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.email,
+                ),
+                validator: (value) => value?.isEmpty ?? true
+                    ? AppLocalizations.of(context)!.required
+                    : null,
               ),
               TextFormField(
                 controller: amountController,
-                decoration: const InputDecoration(labelText: 'Amount (kobo)'),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.amountKobo,
+                ),
                 keyboardType: TextInputType.number,
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Required' : null,
+                validator: (value) => value?.isEmpty ?? true
+                    ? AppLocalizations.of(context)!.required
+                    : null,
               ),
               TextFormField(
                 controller: cardNumberController,
-                decoration: const InputDecoration(labelText: 'Card Number'),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.cardNumber,
+                ),
                 keyboardType: TextInputType.number,
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Required' : null,
+                validator: (value) => value?.isEmpty ?? true
+                    ? AppLocalizations.of(context)!.required
+                    : null,
               ),
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
                       controller: expiryMonthController,
-                      decoration: const InputDecoration(
-                        labelText: 'Expiry Month (MM)',
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.expiryMonth,
                       ),
                       keyboardType: TextInputType.number,
-                      validator: (value) =>
-                          value?.isEmpty ?? true ? 'Required' : null,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? AppLocalizations.of(context)!.required
+                          : null,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextFormField(
                       controller: expiryYearController,
-                      decoration: const InputDecoration(
-                        labelText: 'Expiry Year (YY)',
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.expiryYear,
                       ),
                       keyboardType: TextInputType.number,
-                      validator: (value) =>
-                          value?.isEmpty ?? true ? 'Required' : null,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? AppLocalizations.of(context)!.required
+                          : null,
                     ),
                   ),
                 ],
               ),
               TextFormField(
                 controller: cvvController,
-                decoration: const InputDecoration(labelText: 'CVV'),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.cvv,
+                ),
                 keyboardType: TextInputType.number,
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Required' : null,
+                validator: (value) => value?.isEmpty ?? true
+                    ? AppLocalizations.of(context)!.required
+                    : null,
               ),
               TextFormField(
                 controller: cardHolderController,
-                decoration: const InputDecoration(
-                  labelText: 'Card Holder Name',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.cardHolderName,
                 ),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Required' : null,
+                validator: (value) => value?.isEmpty ?? true
+                    ? AppLocalizations.of(context)!.required
+                    : null,
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -161,7 +182,7 @@ class _MyAppState extends State<MyApp> {
                     );
                   }
                 },
-                child: const Text('Pay'),
+                child: Text(AppLocalizations.of(context)!.pay),
               ),
             ],
           ),
@@ -180,7 +201,7 @@ class _MyAppState extends State<MyApp> {
     required String cardHolderName,
   }) async {
     try {
-      _showSnackBar('Processing card payment...');
+      _showSnackBar(AppLocalizations.of(context)!.processingCardPayment);
       final response = await AllPaystackPayments.initializeCardPayment(
         amount: amount,
         email: email,
@@ -191,12 +212,20 @@ class _MyAppState extends State<MyApp> {
         cardHolderName: cardHolderName,
       );
       _showSnackBar(
-        'Payment ${response.status.name}: ${response.gatewayResponse ?? ''}',
+        AppLocalizations.of(
+          context,
+        )!.paymentStatus(response.status.name, response.gatewayResponse ?? ''),
       );
     } on PaystackError catch (e) {
-      _showSnackBar('Payment failed: ${e.message}', isError: true);
+      _showSnackBar(
+        AppLocalizations.of(context)!.paymentFailed(e.message),
+        isError: true,
+      );
     } catch (e) {
-      _showSnackBar('Unexpected error: $e', isError: true);
+      _showSnackBar(
+        AppLocalizations.of(context)!.unexpectedError(e.toString()),
+        isError: true,
+      );
     }
   }
 
@@ -206,7 +235,7 @@ class _MyAppState extends State<MyApp> {
     final amountController = TextEditingController();
 
     _showPaymentDialog(
-      'Bank Transfer',
+      AppLocalizations.of(context)!.bankTransfer,
       Form(
         key: formKey,
         child: Column(
@@ -214,14 +243,22 @@ class _MyAppState extends State<MyApp> {
           children: [
             TextFormField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.email,
+              ),
+              validator: (value) => value?.isEmpty ?? true
+                  ? AppLocalizations.of(context)!.required
+                  : null,
             ),
             TextFormField(
               controller: amountController,
-              decoration: const InputDecoration(labelText: 'Amount (kobo)'),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.amountKobo,
+              ),
               keyboardType: TextInputType.number,
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+              validator: (value) => value?.isEmpty ?? true
+                  ? AppLocalizations.of(context)!.required
+                  : null,
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -234,7 +271,7 @@ class _MyAppState extends State<MyApp> {
                   );
                 }
               },
-              child: const Text('Initiate Transfer'),
+              child: Text(AppLocalizations.of(context)!.initiateTransfer),
             ),
           ],
         ),
@@ -247,18 +284,26 @@ class _MyAppState extends State<MyApp> {
     required int amount,
   }) async {
     try {
-      _showSnackBar('Initiating bank transfer...');
+      _showSnackBar(AppLocalizations.of(context)!.initiatingBankTransfer);
       final response = await AllPaystackPayments.initializeBankTransfer(
         amount: amount,
         email: email,
       );
       _showSnackBar(
-        'Transfer ${response.status.name}: ${response.gatewayResponse ?? ''}',
+        AppLocalizations.of(
+          context,
+        )!.transferStatus(response.status.name, response.gatewayResponse ?? ''),
       );
     } on PaystackError catch (e) {
-      _showSnackBar('Transfer failed: ${e.message}', isError: true);
+      _showSnackBar(
+        AppLocalizations.of(context)!.transferFailed(e.message),
+        isError: true,
+      );
     } catch (e) {
-      _showSnackBar('Unexpected error: $e', isError: true);
+      _showSnackBar(
+        AppLocalizations.of(context)!.unexpectedError(e.toString()),
+        isError: true,
+      );
     }
   }
 
@@ -270,7 +315,7 @@ class _MyAppState extends State<MyApp> {
     MobileMoneyProvider selectedProvider = MobileMoneyProvider.mpesa;
 
     _showPaymentDialog(
-      'Mobile Money',
+      AppLocalizations.of(context)!.mobileMoney,
       Form(
         key: formKey,
         child: Column(
@@ -278,23 +323,37 @@ class _MyAppState extends State<MyApp> {
           children: [
             TextFormField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.email,
+              ),
+              validator: (value) => value?.isEmpty ?? true
+                  ? AppLocalizations.of(context)!.required
+                  : null,
             ),
             TextFormField(
               controller: amountController,
-              decoration: const InputDecoration(labelText: 'Amount (kobo)'),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.amountKobo,
+              ),
               keyboardType: TextInputType.number,
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+              validator: (value) => value?.isEmpty ?? true
+                  ? AppLocalizations.of(context)!.required
+                  : null,
             ),
             TextFormField(
               controller: phoneController,
-              decoration: const InputDecoration(labelText: 'Phone Number'),
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.phoneNumber,
+              ),
+              validator: (value) => value?.isEmpty ?? true
+                  ? AppLocalizations.of(context)!.required
+                  : null,
             ),
             DropdownButtonFormField<MobileMoneyProvider>(
               value: selectedProvider,
-              decoration: const InputDecoration(labelText: 'Provider'),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.provider,
+              ),
               items: MobileMoneyProvider.values.map((provider) {
                 return DropdownMenuItem(
                   value: provider,
@@ -316,7 +375,7 @@ class _MyAppState extends State<MyApp> {
                   );
                 }
               },
-              child: const Text('Pay'),
+              child: Text(AppLocalizations.of(context)!.pay),
             ),
           ],
         ),
@@ -331,7 +390,7 @@ class _MyAppState extends State<MyApp> {
     required String phoneNumber,
   }) async {
     try {
-      _showSnackBar('Processing mobile money payment...');
+      _showSnackBar(AppLocalizations.of(context)!.processingMobileMoney);
       final response = await AllPaystackPayments.initializeMobileMoney(
         amount: amount,
         email: email,
@@ -339,27 +398,58 @@ class _MyAppState extends State<MyApp> {
         phoneNumber: phoneNumber,
       );
       _showSnackBar(
-        'Payment ${response.status.name}: ${response.gatewayResponse ?? ''}',
+        AppLocalizations.of(
+          context,
+        )!.paymentStatus(response.status.name, response.gatewayResponse ?? ''),
       );
     } on PaystackError catch (e) {
-      _showSnackBar('Payment failed: ${e.message}', isError: true);
+      _showSnackBar(
+        AppLocalizations.of(context)!.paymentFailed(e.message),
+        isError: true,
+      );
     } catch (e) {
-      _showSnackBar('Unexpected error: $e', isError: true);
+      _showSnackBar(
+        AppLocalizations.of(context)!.unexpectedError(e.toString()),
+        isError: true,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: _currentLocale,
       home: Scaffold(
-        appBar: AppBar(title: const Text('Paystack Payment Example')),
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.appTitle),
+          actions: [
+            DropdownButton<Locale>(
+              value: _currentLocale,
+              onChanged: (Locale? newLocale) {
+                if (newLocale != null) {
+                  setState(() {
+                    _currentLocale = newLocale;
+                  });
+                }
+              },
+              items: const [
+                DropdownMenuItem(value: Locale('en'), child: Text('English')),
+                DropdownMenuItem(value: Locale('fr'), child: Text('Français')),
+              ],
+            ),
+          ],
+        ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                _isInitialized ? 'Ready to accept payments' : 'Initializing...',
+                _isInitialized
+                    ? AppLocalizations.of(context)!.readyToAcceptPayments
+                    : AppLocalizations.of(context)!.initializing,
                 style: TextStyle(
                   color: _isInitialized ? Colors.green : Colors.orange,
                   fontWeight: FontWeight.bold,
@@ -371,17 +461,17 @@ class _MyAppState extends State<MyApp> {
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: _isInitialized ? _handleCardPayment : null,
-                child: const Text('Pay with Card'),
+                child: Text(AppLocalizations.of(context)!.payWithCard),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _isInitialized ? _handleBankTransfer : null,
-                child: const Text('Pay with Bank Transfer'),
+                child: Text(AppLocalizations.of(context)!.payWithBankTransfer),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _isInitialized ? _handleMobileMoney : null,
-                child: const Text('Pay with Mobile Money'),
+                child: Text(AppLocalizations.of(context)!.payWithMobileMoney),
               ),
             ],
           ),

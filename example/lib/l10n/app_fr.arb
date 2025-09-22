@@ -1,0 +1,166 @@
+{
+  "appTitle": "Exemple de paiements Paystack",
+  "@appTitle": {
+    "description": "The title of the app"
+  },
+  "readyToAcceptPayments": "Prêt à accepter les paiements",
+  "@readyToAcceptPayments": {
+    "description": "Status message when Paystack is initialized"
+  },
+  "initializing": "Initialisation...",
+  "@initializing": {
+    "description": "Status message during initialization"
+  },
+  "cardPayment": "Paiement par carte",
+  "@cardPayment": {
+    "description": "Title for card payment dialog"
+  },
+  "bankTransfer": "Virement bancaire",
+  "@bankTransfer": {
+    "description": "Title for bank transfer dialog"
+  },
+  "mobileMoney": "Argent mobile",
+  "@mobileMoney": {
+    "description": "Title for mobile money dialog"
+  },
+  "email": "E-mail",
+  "@email": {
+    "description": "Label for email input field"
+  },
+  "amountKobo": "Montant (kobo)",
+  "@amountKobo": {
+    "description": "Label for amount input field in kobo"
+  },
+  "cardNumber": "Numéro de carte",
+  "@cardNumber": {
+    "description": "Label for card number input field"
+  },
+  "expiryMonth": "Mois d'expiration (MM)",
+  "@expiryMonth": {
+    "description": "Label for expiry month input field"
+  },
+  "expiryYear": "Année d'expiration (AA)",
+  "@expiryYear": {
+    "description": "Label for expiry year input field"
+  },
+  "cvv": "CVV",
+  "@cvv": {
+    "description": "Label for CVV input field"
+  },
+  "cardHolderName": "Nom du titulaire de la carte",
+  "@cardHolderName": {
+    "description": "Label for card holder name input field"
+  },
+  "phoneNumber": "Numéro de téléphone",
+  "@phoneNumber": {
+    "description": "Label for phone number input field"
+  },
+  "provider": "Fournisseur",
+  "@provider": {
+    "description": "Label for mobile money provider dropdown"
+  },
+  "cancel": "Annuler",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "pay": "Payer",
+  "@pay": {
+    "description": "Pay button text"
+  },
+  "initiateTransfer": "Initier le transfert",
+  "@initiateTransfer": {
+    "description": "Initiate transfer button text"
+  },
+  "payWithCard": "Payer par carte",
+  "@payWithCard": {
+    "description": "Button text for card payment"
+  },
+  "payWithBankTransfer": "Payer par virement bancaire",
+  "@payWithBankTransfer": {
+    "description": "Button text for bank transfer payment"
+  },
+  "payWithMobileMoney": "Payer avec de l'argent mobile",
+  "@payWithMobileMoney": {
+    "description": "Button text for mobile money payment"
+  },
+  "required": "Requis",
+  "@required": {
+    "description": "Validation message for required fields"
+  },
+  "processingCardPayment": "Traitement du paiement par carte...",
+  "@processingCardPayment": {
+    "description": "Message shown while processing card payment"
+  },
+  "paymentStatus": "Paiement {status}: {response}",
+  "@paymentStatus": {
+    "description": "Payment status message with placeholders",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      },
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentFailed": "Échec du paiement: {message}",
+  "@paymentFailed": {
+    "description": "Payment failure message with placeholder",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "unexpectedError": "Erreur inattendue: {error}",
+  "@unexpectedError": {
+    "description": "Unexpected error message with placeholder",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "initiatingBankTransfer": "Initiation du virement bancaire...",
+  "@initiatingBankTransfer": {
+    "description": "Message shown while initiating bank transfer"
+  },
+  "transferStatus": "Transfert {status}: {response}",
+  "@transferStatus": {
+    "description": "Transfer status message with placeholders",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      },
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "transferFailed": "Échec du transfert: {message}",
+  "@transferFailed": {
+    "description": "Transfer failure message with placeholder",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "processingMobileMoney": "Traitement du paiement mobile...",
+  "@processingMobileMoney": {
+    "description": "Message shown while processing mobile money payment"
+  },
+  "paystackInitialized": "Paystack initialisé avec succès",
+  "@paystackInitialized": {
+    "description": "Success message for Paystack initialization"
+  },
+  "paystackInitFailed": "Échec de l'initialisation de Paystack: {error}",
+  "@paystackInitFailed": {
+    "description": "Failure message for Paystack initialization with placeholder",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
+}
