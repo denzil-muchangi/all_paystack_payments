@@ -1,15 +1,40 @@
 # all_paystack_payments
 
-Flutter plugin for paystack.
+A Flutter plugin for integrating Paystack payment services, supporting card payments, bank transfers, and mobile money.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+- Secure card payments
+- Bank transfer payments
+- Mobile money payments
+- Cross-platform support
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Supported Platforms
 
+- Android
+- iOS
+- Web
+- macOS
+- Linux
+- Windows
+
+## Installation
+
+Add the following to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  all_paystack_payments: ^1.0.0
+```
+
+Then run `flutter pub get`.
+
+## Quick Start
+
+Import the package:
+
+```dart
+import 'package:all_paystack_payments/all_paystack_payments.dart';
+```
+
+Initialize and use the plugin for payments. See [USAGE_README.md](USAGE_README.md) for detailed usage instructions.
