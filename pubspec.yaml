@@ -11,7 +11,6 @@ topics:
   - flutter
   - mobile-money
   - api
-  - integration
 
 environment:
   sdk: ^3.9.2
