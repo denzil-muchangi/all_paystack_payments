@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:all_paystack_payments/all_paystack_payments.dart';
 
 import 'l10n/app_localizations.dart';
@@ -62,7 +60,11 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void _showSnackBar(String message, {bool isError = false}) {
+  void _showSnackBar(
+    BuildContext context,
+    String message, {
+    bool isError = false,
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -200,8 +202,12 @@ class _MyAppState extends State<MyApp> {
     required String cvv,
     required String cardHolderName,
   }) async {
+    final currentContext = context;
     try {
-      _showSnackBar(AppLocalizations.of(context)!.processingCardPayment);
+      _showSnackBar(
+        currentContext,
+        AppLocalizations.of(currentContext)!.processingCardPayment,
+      );
       final response = await AllPaystackPayments.initializeCardPayment(
         amount: amount,
         email: email,
@@ -212,18 +218,21 @@ class _MyAppState extends State<MyApp> {
         cardHolderName: cardHolderName,
       );
       _showSnackBar(
+        currentContext,
         AppLocalizations.of(
-          context,
+          currentContext,
         )!.paymentStatus(response.status.name, response.gatewayResponse ?? ''),
       );
     } on PaystackError catch (e) {
       _showSnackBar(
-        AppLocalizations.of(context)!.paymentFailed(e.message),
+        currentContext,
+        AppLocalizations.of(currentContext)!.paymentFailed(e.message),
         isError: true,
       );
     } catch (e) {
       _showSnackBar(
-        AppLocalizations.of(context)!.unexpectedError(e.toString()),
+        currentContext,
+        AppLocalizations.of(currentContext)!.unexpectedError(e.toString()),
         isError: true,
       );
     }
@@ -283,25 +292,32 @@ class _MyAppState extends State<MyApp> {
     required String email,
     required int amount,
   }) async {
+    final currentContext = context;
     try {
-      _showSnackBar(AppLocalizations.of(context)!.initiatingBankTransfer);
+      _showSnackBar(
+        currentContext,
+        AppLocalizations.of(currentContext)!.initiatingBankTransfer,
+      );
       final response = await AllPaystackPayments.initializeBankTransfer(
         amount: amount,
         email: email,
       );
       _showSnackBar(
+        currentContext,
         AppLocalizations.of(
-          context,
+          currentContext,
         )!.transferStatus(response.status.name, response.gatewayResponse ?? ''),
       );
     } on PaystackError catch (e) {
       _showSnackBar(
-        AppLocalizations.of(context)!.transferFailed(e.message),
+        currentContext,
+        AppLocalizations.of(currentContext)!.transferFailed(e.message),
         isError: true,
       );
     } catch (e) {
       _showSnackBar(
-        AppLocalizations.of(context)!.unexpectedError(e.toString()),
+        currentContext,
+        AppLocalizations.of(currentContext)!.unexpectedError(e.toString()),
         isError: true,
       );
     }
@@ -350,7 +366,7 @@ class _MyAppState extends State<MyApp> {
                   : null,
             ),
             DropdownButtonFormField<MobileMoneyProvider>(
-              value: selectedProvider,
+              initialValue: selectedProvider,
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)!.provider,
               ),
@@ -389,8 +405,12 @@ class _MyAppState extends State<MyApp> {
     required MobileMoneyProvider provider,
     required String phoneNumber,
   }) async {
+    final currentContext = context;
     try {
-      _showSnackBar(AppLocalizations.of(context)!.processingMobileMoney);
+      _showSnackBar(
+        currentContext,
+        AppLocalizations.of(currentContext)!.processingMobileMoney,
+      );
       final response = await AllPaystackPayments.initializeMobileMoney(
         amount: amount,
         email: email,
@@ -398,18 +418,21 @@ class _MyAppState extends State<MyApp> {
         phoneNumber: phoneNumber,
       );
       _showSnackBar(
+        currentContext,
         AppLocalizations.of(
-          context,
+          currentContext,
         )!.paymentStatus(response.status.name, response.gatewayResponse ?? ''),
       );
     } on PaystackError catch (e) {
       _showSnackBar(
-        AppLocalizations.of(context)!.paymentFailed(e.message),
+        currentContext,
+        AppLocalizations.of(currentContext)!.paymentFailed(e.message),
         isError: true,
       );
     } catch (e) {
       _showSnackBar(
-        AppLocalizations.of(context)!.unexpectedError(e.toString()),
+        currentContext,
+        AppLocalizations.of(currentContext)!.unexpectedError(e.toString()),
         isError: true,
       );
     }
