@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:all_paystack_payments/all_paystack_payments.dart';
 
@@ -29,22 +30,29 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initializePaystack() async {
     try {
-      // Initialize with test public key - replace with your actual test key
-      await AllPaystackPayments.initialize('pk_test_your_test_public_key_here');
+      const key = 'pk_test_1234567890abcdef'; // Test key for simulation
+      // Initialize with test public key
+      await AllPaystackPayments.initialize(key);
       setState(() {
         _isInitialized = true;
-        _statusMessage = AppLocalizations.of(context)!.paystackInitialized;
+        _statusMessage =
+            AppLocalizations.of(context)?.paystackInitialized ??
+            'Paystack initialized successfully';
       });
     } catch (e) {
       setState(() {
-        _statusMessage = AppLocalizations.of(
-          context,
-        )!.paystackInitFailed(e.toString());
+        _statusMessage =
+            AppLocalizations.of(context)?.paystackInitFailed(e.toString()) ??
+            'Failed to initialize Paystack: ${e.toString()}';
       });
     }
   }
 
-  void _showPaymentDialog(String title, Widget content) {
+  void _showPaymentDialog(
+    String title,
+    Widget content, {
+    AppLocalizations? localizations,
+  }) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -53,7 +61,7 @@ class _MyAppState extends State<MyApp> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(localizations?.cancel ?? 'Cancel'),
           ),
         ],
       ),
@@ -84,7 +92,7 @@ class _MyAppState extends State<MyApp> {
     final amountController = TextEditingController();
 
     _showPaymentDialog(
-      AppLocalizations.of(context)!.cardPayment,
+      AppLocalizations.of(context)?.cardPayment ?? 'Card Payment',
       Form(
         key: formKey,
         child: SingleChildScrollView(
@@ -116,9 +124,12 @@ class _MyAppState extends State<MyApp> {
                   labelText: AppLocalizations.of(context)!.cardNumber,
                 ),
                 keyboardType: TextInputType.number,
-                validator: (value) => value?.isEmpty ?? true
-                    ? AppLocalizations.of(context)!.required
-                    : null,
+                validator: (value) {
+                  if (value?.isEmpty ?? true) return 'Required';
+                  final regex = RegExp(r'^\d{13,19}$');
+                  if (!regex.hasMatch(value!)) return 'Invalid card number';
+                  return null;
+                },
               ),
               Row(
                 children: [
@@ -208,6 +219,10 @@ class _MyAppState extends State<MyApp> {
         currentContext,
         AppLocalizations.of(currentContext)!.processingCardPayment,
       );
+      final metadata = {
+        'payment_type': 'card',
+        'timestamp': DateTime.now().toIso8601String(),
+      };
       final response = await AllPaystackPayments.initializeCardPayment(
         amount: amount,
         email: email,
@@ -216,23 +231,36 @@ class _MyAppState extends State<MyApp> {
         expiryYear: expiryYear,
         cvv: cvv,
         cardHolderName: cardHolderName,
+        metadata: metadata,
       );
+      if (!mounted) return;
       _showSnackBar(
-        currentContext,
+        context,
         AppLocalizations.of(
-          currentContext,
+          context,
         )!.paymentStatus(response.status.name, response.gatewayResponse ?? ''),
       );
     } on PaystackError catch (e) {
+      if (!mounted) return;
+      log('Card payment error: $e');
       _showSnackBar(
-        currentContext,
-        AppLocalizations.of(currentContext)!.paymentFailed(e.message),
+        context,
+        AppLocalizations.of(context)!.paymentFailed(e.message),
+        isError: true,
+      );
+    } on ArgumentError catch (e) {
+      if (!mounted) return;
+      _showSnackBar(
+        context,
+        'Invalid card details: ${e.message}',
         isError: true,
       );
     } catch (e) {
+      if (!mounted) return;
+      log('Card payment error: $e');
       _showSnackBar(
-        currentContext,
-        AppLocalizations.of(currentContext)!.unexpectedError(e.toString()),
+        context,
+        AppLocalizations.of(context)!.unexpectedError(e.toString()),
         isError: true,
       );
     }
@@ -253,10 +281,10 @@ class _MyAppState extends State<MyApp> {
             TextFormField(
               controller: emailController,
               decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.email,
+                labelText: AppLocalizations.of(context)?.email ?? 'Email',
               ),
               validator: (value) => value?.isEmpty ?? true
-                  ? AppLocalizations.of(context)!.required
+                  ? AppLocalizations.of(context)?.required ?? 'Required'
                   : null,
             ),
             TextFormField(
@@ -285,6 +313,7 @@ class _MyAppState extends State<MyApp> {
           ],
         ),
       ),
+      localizations: AppLocalizations.of(context),
     );
   }
 
@@ -302,22 +331,25 @@ class _MyAppState extends State<MyApp> {
         amount: amount,
         email: email,
       );
+      if (!mounted) return;
       _showSnackBar(
-        currentContext,
+        context,
         AppLocalizations.of(
-          currentContext,
+          context,
         )!.transferStatus(response.status.name, response.gatewayResponse ?? ''),
       );
     } on PaystackError catch (e) {
+      if (!mounted) return;
       _showSnackBar(
-        currentContext,
-        AppLocalizations.of(currentContext)!.transferFailed(e.message),
+        context,
+        AppLocalizations.of(context)!.transferFailed(e.message),
         isError: true,
       );
     } catch (e) {
+      if (!mounted) return;
       _showSnackBar(
-        currentContext,
-        AppLocalizations.of(currentContext)!.unexpectedError(e.toString()),
+        context,
+        AppLocalizations.of(context)!.unexpectedError(e.toString()),
         isError: true,
       );
     }
@@ -361,9 +393,14 @@ class _MyAppState extends State<MyApp> {
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)!.phoneNumber,
               ),
-              validator: (value) => value?.isEmpty ?? true
-                  ? AppLocalizations.of(context)!.required
-                  : null,
+              validator: (value) {
+                if (value?.isEmpty ?? true) return 'Required';
+                final regex = RegExp(r'^\+\d{10,15}$');
+                if (!regex.hasMatch(value!)) {
+                  return 'Invalid phone number (include country code)';
+                }
+                return null;
+              },
             ),
             DropdownButtonFormField<MobileMoneyProvider>(
               initialValue: selectedProvider,
@@ -411,28 +448,35 @@ class _MyAppState extends State<MyApp> {
         currentContext,
         AppLocalizations.of(currentContext)!.processingMobileMoney,
       );
+      if (phoneNumber.startsWith('+254') &&
+          provider != MobileMoneyProvider.mpesa) {
+        throw ArgumentError('Only M-Pesa supported for Kenya');
+      }
       final response = await AllPaystackPayments.initializeMobileMoney(
         amount: amount,
         email: email,
         provider: provider,
         phoneNumber: phoneNumber,
       );
+      if (!mounted) return;
       _showSnackBar(
-        currentContext,
+        context,
         AppLocalizations.of(
-          currentContext,
+          context,
         )!.paymentStatus(response.status.name, response.gatewayResponse ?? ''),
       );
     } on PaystackError catch (e) {
+      if (!mounted) return;
       _showSnackBar(
-        currentContext,
-        AppLocalizations.of(currentContext)!.paymentFailed(e.message),
+        context,
+        AppLocalizations.of(context)!.paymentFailed(e.message),
         isError: true,
       );
     } catch (e) {
+      if (!mounted) return;
       _showSnackBar(
-        currentContext,
-        AppLocalizations.of(currentContext)!.unexpectedError(e.toString()),
+        context,
+        AppLocalizations.of(context)!.unexpectedError(e.toString()),
         isError: true,
       );
     }
@@ -446,7 +490,10 @@ class _MyAppState extends State<MyApp> {
       locale: _currentLocale,
       home: Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.appTitle),
+          title: Text(
+            AppLocalizations.of(context)?.appTitle ??
+                'Paystack Payments Example',
+          ),
           actions: [
             DropdownButton<Locale>(
               value: _currentLocale,
@@ -471,8 +518,10 @@ class _MyAppState extends State<MyApp> {
             children: [
               Text(
                 _isInitialized
-                    ? AppLocalizations.of(context)!.readyToAcceptPayments
-                    : AppLocalizations.of(context)!.initializing,
+                    ? AppLocalizations.of(context)?.readyToAcceptPayments ??
+                          'Ready to accept payments'
+                    : AppLocalizations.of(context)?.initializing ??
+                          'Initializing...',
                 style: TextStyle(
                   color: _isInitialized ? Colors.green : Colors.orange,
                   fontWeight: FontWeight.bold,
@@ -484,17 +533,25 @@ class _MyAppState extends State<MyApp> {
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: _isInitialized ? _handleCardPayment : null,
-                child: Text(AppLocalizations.of(context)!.payWithCard),
+                child: Text(
+                  AppLocalizations.of(context)?.payWithCard ?? 'Pay with Card',
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _isInitialized ? _handleBankTransfer : null,
-                child: Text(AppLocalizations.of(context)!.payWithBankTransfer),
+                child: Text(
+                  AppLocalizations.of(context)?.payWithBankTransfer ??
+                      'Pay with Bank Transfer',
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _isInitialized ? _handleMobileMoney : null,
-                child: Text(AppLocalizations.of(context)!.payWithMobileMoney),
+                child: Text(
+                  AppLocalizations.of(context)?.payWithMobileMoney ??
+                      'Pay with Mobile Money',
+                ),
               ),
             ],
           ),
