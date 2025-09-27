@@ -7,6 +7,12 @@
 
 ### Changed
 - Breaking changes: API stabilization and method signatures updated for production readiness
+
+## [1.0.1] - 2025-09-27
+
+### Fixed
+- Minor fixes and improvements
+
 ## 0.0.1
 
 * TODO: Describe initial release.

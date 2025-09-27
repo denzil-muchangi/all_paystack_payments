@@ -1,6 +1,6 @@
 name: all_paystack_payments
 description: "A Flutter plugin for integrating Paystack payment services, supporting card payments, bank transfers, and mobile money."
-version: 1.0.0
+version: 1.0.1
 homepage: https://pub.dev/packages/all_paystack_payments
 repository: https://github.com/xeplas/all_paystack_payments
 issue_tracker: https://github.com/xeplas/all_paystack_payments/issues
