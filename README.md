@@ -385,7 +385,7 @@ This project is licensed under the MIT License, which allows free use, modificat
 - 📖 [Documentation](https://pub.dev/packages/all_paystack_payments)
 - 🐛 [Issues](https://github.com/your-repo/all_paystack_payments/issues)
 - 💬 [Discussions](https://github.com/your-repo/all_paystack_payments/discussions)
-- 📧 Contact: support@your-domain.com
+- 📧 Contact: support@xeplas.com
 
 ## Changelog
 
