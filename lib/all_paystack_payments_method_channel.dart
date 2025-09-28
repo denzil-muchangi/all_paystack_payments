@@ -35,7 +35,11 @@ class MethodChannelAllPaystackPayments extends AllPaystackPaymentsPlatform {
       if (result == null) {
         throw PaystackError(message: 'No response from payment initialization');
       }
-      return PaymentResponse.fromApiResponse(result.cast<String, dynamic>());
+      final castedResult = result.cast<String, dynamic>();
+      if (castedResult['status'] != 'success') {
+        throw PaystackError.fromApiResponse(castedResult);
+      }
+      return PaymentResponse.fromApiResponse(castedResult);
     } on PlatformException catch (e) {
       throw PaystackError(
         message: e.message ?? 'Failed to initialize payment',
@@ -54,7 +58,11 @@ class MethodChannelAllPaystackPayments extends AllPaystackPaymentsPlatform {
       if (result == null) {
         throw PaystackError(message: 'No response from payment verification');
       }
-      return PaymentResponse.fromApiResponse(result.cast<String, dynamic>());
+      final castedResult = result.cast<String, dynamic>();
+      if (castedResult['status'] != 'success') {
+        throw PaystackError.fromApiResponse(castedResult);
+      }
+      return PaymentResponse.fromApiResponse(castedResult);
     } on PlatformException catch (e) {
       throw PaystackError(
         message: e.message ?? 'Failed to verify payment',
@@ -73,7 +81,11 @@ class MethodChannelAllPaystackPayments extends AllPaystackPaymentsPlatform {
       if (result == null) {
         throw PaystackError(message: 'No response from payment status check');
       }
-      return PaymentResponse.fromApiResponse(result.cast<String, dynamic>());
+      final castedResult = result.cast<String, dynamic>();
+      if (castedResult['status'] != 'success') {
+        throw PaystackError.fromApiResponse(castedResult);
+      }
+      return PaymentResponse.fromApiResponse(castedResult);
     } on PlatformException catch (e) {
       throw PaystackError(
         message: e.message ?? 'Failed to get payment status',
