@@ -14,8 +14,6 @@ import 'package:http/http.dart' as http;
 import 'package:web/web.dart' as web;
 
 import 'all_paystack_payments_platform_interface.dart';
-import 'card_payment_request.dart';
-import 'mobile_money_request.dart';
 import 'payment_request.dart';
 import 'payment_response.dart';
 import 'paystack_error.dart';
@@ -168,76 +166,6 @@ class AllPaystackPaymentsWeb extends AllPaystackPaymentsPlatform {
       if (e is PaystackError) rethrow;
       throw PaystackError(message: 'Failed to get checkout URL: $e');
     }
-  }
-
-  JSObject _createPaystackConfig(PaymentRequest request, String reference) {
-    final config = <String, dynamic>{
-      'key': _publicKey,
-      'email': request.email,
-      'amount': request.amount,
-      'currency': request.currency.name.toUpperCase(),
-      'ref': reference,
-      'callback': _createCallback(reference),
-      'onClose': _createOnCloseCallback(reference),
-    };
-
-    // Add payment method specific configuration
-    if (request is CardPaymentRequest) {
-      // For card payments, Paystack handles the form
-      config.addAll({
-        'channels': ['card'],
-      });
-    } else if (request is MobileMoneyRequest) {
-      config.addAll({
-        'channels': ['mobile_money'],
-        'mobile_money': {
-          'phone': request.phoneNumber,
-          'provider': request.provider.name,
-        },
-      });
-    } else if (request.runtimeType == PaymentRequest) {
-      // Bank transfer - Paystack will show all available channels
-      config.addAll({
-        'channels': ['bank', 'card', 'mobile_money'],
-      });
-    }
-
-    if (request.metadata != null) {
-      config['metadata'] = request.metadata;
-    }
-
-    return config.jsify() as JSObject;
-  }
-
-  void Function(JSObject) _createCallback(String reference) {
-    // This will be converted to JS function automatically
-    return (JSObject response) {
-      final completer = _paymentCompleters.remove(reference);
-      if (completer != null && !completer.isCompleted) {
-        try {
-          final paymentResponse = PaymentResponse.fromApiResponse(
-            response.dartify() as Map<String, dynamic>,
-          );
-          completer.complete(paymentResponse);
-        } catch (e) {
-          completer.completeError(
-            PaystackError(message: 'Payment callback error: $e'),
-          );
-        }
-      }
-    };
-  }
-
-  void Function() _createOnCloseCallback(String reference) {
-    // This will be converted to JS function automatically
-    return () {
-      final completer = _paymentCompleters.remove(reference);
-      if (completer != null && !completer.isCompleted) {
-        completer.completeError(
-          PaystackError(message: 'Payment cancelled by user'),
-        );
-      }
-    };
   }
 
   String _generateReference() {

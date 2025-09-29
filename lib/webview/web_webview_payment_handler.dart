@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:js_interop';
 import 'package:web/web.dart' as web;
 import '../webview_payment_handler.dart';
 import '../payment_response.dart';
-import '../paystack_error.dart';
 import '../enums.dart';
 
 /// Web implementation of WebViewPaymentHandler

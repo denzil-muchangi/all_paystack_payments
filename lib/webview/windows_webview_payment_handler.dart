@@ -62,12 +62,12 @@ class WindowsWebViewPaymentHandler implements WebViewPaymentHandler {
         message: e.message ?? 'Webview payment failed',
         code: e.code,
       );
-    } on TimeoutException catch (e) {
+    } on TimeoutException {
       throw PaystackError(
         message: 'Payment timeout - user took too long to complete payment',
         code: 'PAYMENT_TIMEOUT',
       );
-    } catch (e) {
+    } catch (_) {
       throw PaystackError(
         message: 'Unexpected error during payment',
         code: 'WEBVIEW_ERROR',
