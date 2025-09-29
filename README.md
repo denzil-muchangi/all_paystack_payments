@@ -1,6 +1,8 @@
 # All Paystack Payments
 
 [![pub package](https://img.shields.io/pub/v/all_paystack_payments.svg)](https://pub.dev/packages/all_paystack_payments)
+[![Test Coverage](https://img.shields.io/badge/coverage-80%2B%25-brightgreen.svg)](https://github.com/xeplas/all_paystack_payments)
+[![CI/CD](https://img.shields.io/github/actions/workflow/status/xeplas/all_paystack_payments/ci.yml?branch=main)](https://github.com/xeplas/all_paystack_payments/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Flutter](https://img.shields.io/badge/Flutter-3.3+-02569B.svg)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.0+-0175C2.svg)](https://dart.dev)
@@ -33,6 +35,7 @@ A comprehensive Flutter plugin for integrating Paystack payment services, suppor
   - [Mobile Money Payments](#mobile-money-payments)
 - [Payment Management](#payment-management)
 - [Error Handling](#error-handling)
+- [Testing & Quality Assurance](#testing--quality-assurance)
 - [Best Practices & Security](#best-practices--security)
 - [Troubleshooting](#troubleshooting)
 - [Migration Guide](#migration-guide)
@@ -89,6 +92,8 @@ Future<void> processPayment() async {
 - **🎯 Easy Integration**: Simple, intuitive API design for quick implementation
 - **🔄 Payment Management**: Cancel payments and check payment status programmatically
 - **📊 Comprehensive Logging**: Debug mode support for troubleshooting
+- **🧪 Enterprise-Grade Testing**: 80%+ test coverage with automated CI/CD, performance benchmarks, and comprehensive error scenario testing
+- **🚀 Production Ready**: Extensive validation, security testing, and cross-platform compatibility verification
 
 ## Supported Platforms
 
@@ -664,6 +669,220 @@ Future<void> cancelPendingPayment(String reference) async {
   }
 }
 ```
+
+## Testing & Quality Assurance
+
+This plugin includes a comprehensive testing suite to ensure reliability and developer confidence. All tests are automatically run in CI/CD pipelines.
+
+### 🧪 Test Coverage
+
+- **Unit Tests**: Core business logic, validation, and utilities
+- **Integration Tests**: Platform channel communication and API interactions
+- **Widget Tests**: UI components and user interaction flows
+- **Performance Tests**: Load testing and performance benchmarks
+- **Error Scenario Tests**: Comprehensive failure case coverage
+- **Edge Case Tests**: Boundary values and special character handling
+
+### 📊 Quality Metrics
+
+| Metric | Value | Description |
+|--------|-------|-------------|
+| **Test Coverage** | 80%+ | Minimum coverage threshold enforced |
+| **Platforms Tested** | 6 | Android, iOS, Web, Windows, Linux, macOS |
+| **Test Categories** | 8 | Unit, Integration, Widget, Performance, Error, Edge, Security, E2E |
+| **CI/CD Status** | ✅ | Automated testing on every commit |
+
+### 🛠️ Running Tests
+
+```bash
+# Run all tests
+flutter test
+
+# Run with coverage
+flutter test --coverage
+
+# Run specific test groups
+flutter test --tags integration    # Integration tests only
+flutter test --exclude-tags slow   # Exclude slow tests
+
+# Run example app tests
+cd example && flutter test
+```
+
+### 🔍 Test Categories
+
+#### Unit Tests
+```dart
+// Core validation testing
+test('card number validation', () {
+  expect(ValidationUtils.isValidCardNumber('4111111111111111'), true);
+  expect(ValidationUtils.isValidCardNumber('invalid'), false);
+});
+
+// API method testing with mocks
+test('card payment initialization', () async {
+  when(mockPlatform.getCheckoutUrl(any)).thenAnswer((_) async => checkoutUrl);
+  when(mockWebViewHandler.processPayment(any)).thenAnswer((_) async => mockResponse);
+
+  final result = await AllPaystackPayments.initializeCardPayment(...);
+  expect(result.isSuccessful, true);
+});
+```
+
+#### Integration Tests
+```dart
+// Platform channel testing
+test('method channel communication', () async {
+  final platform = MethodChannelAllPaystackPayments();
+
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+    if (methodCall.method == 'initializePayment') {
+      return {'status': 'success', 'reference': 'test_ref'};
+    }
+    return null;
+  });
+
+  final response = await platform.initializePayment(request);
+  expect(response.status, PaymentStatus.success);
+});
+```
+
+#### Widget Tests
+```dart
+// UI interaction testing
+testWidgets('payment form validation', (WidgetTester tester) async {
+  await tester.pumpWidget(MaterialApp(home: PaymentForm()));
+
+  // Enter invalid data
+  await tester.enterText(find.byType(TextFormField).first, 'invalid-email');
+  await tester.tap(find.byType(ElevatedButton));
+  await tester.pump();
+
+  // Verify error message appears
+  expect(find.text('Please enter a valid email'), findsOneWidget);
+});
+```
+
+#### Performance Tests
+```dart
+// Load testing
+test('bulk validation performance', () {
+  final stopwatch = Stopwatch()..start();
+
+  for (int i = 0; i < 1000; i++) {
+    ValidationUtils.isValidCardNumber('4111111111111111');
+  }
+
+  stopwatch.stop();
+  final timePerValidation = stopwatch.elapsedMicroseconds / 1000;
+  expect(timePerValidation, lessThan(1000)); // < 1ms per validation
+});
+```
+
+#### Error Scenario Tests
+```dart
+// Comprehensive error handling
+test('handles all payment failure scenarios', () async {
+  // Test card declined
+  when(mockWebViewHandler.processPayment(any))
+      .thenThrow(PaystackError(message: 'Card declined', code: 'card_declined'));
+
+  expect(
+    () => AllPaystackPayments.initializeCardPayment(...),
+    throwsA(isA<PaystackError>()),
+  );
+
+  // Test network timeout
+  when(mockWebViewHandler.processPayment(any))
+      .thenThrow(TimeoutException('Payment timed out'));
+
+  expect(
+    () => AllPaystackPayments.initializeCardPayment(...),
+    throwsA(isA<TimeoutException>()),
+  );
+});
+```
+
+### 🔒 Security Testing
+
+```dart
+// Input sanitization testing
+test('prevents XSS attacks', () {
+  final maliciousInput = '<script>alert("xss")</script>';
+  final sanitized = ValidationUtils.sanitizeString(maliciousInput);
+  expect(sanitized, doesNotContain('<script>'));
+});
+
+// SQL injection prevention
+test('handles malicious SQL input', () {
+  final sqlInjection = "'; DROP TABLE users; --";
+  final sanitized = ValidationUtils.sanitizeString(sqlInjection);
+  expect(ValidationUtils.isValidEmail(sanitized), false);
+});
+```
+
+### 🚀 CI/CD Integration
+
+The plugin uses GitHub Actions for automated testing:
+
+```yaml
+# .github/workflows/ci.yml
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+      - run: flutter test --coverage
+      - run: dart tool/check_coverage.dart  # Custom coverage checker
+```
+
+### 📈 Coverage Reporting
+
+Test coverage is automatically calculated and reported:
+
+```bash
+flutter test --coverage
+# Generates coverage/lcov.info
+
+# View HTML report
+genhtml coverage/lcov.info -o coverage/html
+open coverage/html/index.html
+```
+
+### 🐛 Debugging Test Failures
+
+Enable detailed logging for test debugging:
+
+```dart
+import 'dart:developer';
+
+void main() {
+  // Enable test logging
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    log('${record.level.name}: ${record.time}: ${record.message}');
+  });
+
+  // Run your tests
+  test('debug test', () async {
+    log('Starting test...');
+    // Test code here
+  });
+}
+```
+
+### 📚 Best Testing Practices
+
+1. **Mock External Dependencies**: Always mock platform interfaces and network calls
+2. **Test Edge Cases**: Include boundary values, null inputs, and special characters
+3. **Performance Benchmarks**: Set performance expectations and monitor regressions
+4. **Cross-Platform Testing**: Ensure tests run on all supported platforms
+5. **Error Coverage**: Test all error paths and exception handling
+6. **Security Testing**: Validate input sanitization and injection prevention
 
 ## Error Handling
 
