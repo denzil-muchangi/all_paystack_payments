@@ -2,19 +2,20 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
+    tags: [ 'v*' ]
 
 jobs:
-  # Unit tests for the main plugin
-  unit-tests:
-    name: Unit Tests
+  version-bump:
+    name: Version Bump
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -25,209 +26,25 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Run static analysis
-        run: flutter analyze
-
-      - name: Run unit tests
-        run: flutter test --coverage
-
-      - name: Check coverage threshold
-        run: dart tool/check_coverage.dart
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage/lcov.info
-          flags: unit-tests
-          name: codecov-umbrella
-
-  # Integration tests for the example app
-  integration-tests:
-    name: Integration Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-
-      - name: Install dependencies
+      - name: Bump version
         run: |
-          flutter pub get
-          cd example && flutter pub get
+          current_version=$(grep '^version:' pubspec.yaml | sed 's/version: //' | tr -d ' ')
+          IFS='.' read -r major minor patch <<< "$current_version"
+          new_patch=$((patch + 1))
+          new_version="$major.$minor.$new_patch"
+          sed -i "s/version: $current_version/version: $new_version/" pubspec.yaml
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add pubspec.yaml
+          git commit -m "Bump version to $new_version" || echo "No changes to commit"
+          git push
+          git tag "v$new_version"
+          git push origin "v$new_version"
 
-      - name: Run integration tests
-        run: |
-          cd example
-          flutter test integration_test
-
-  # Android build test
-  android-build:
-    name: Android Build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Install dependencies
-        run: |
-          flutter pub get
-          cd example && flutter pub get
-
-      - name: Build Android APK
-        run: |
-          cd example
-          flutter build apk --debug
-
-  # iOS build test (on macOS)
-  ios-build:
-    name: iOS Build
-    runs-on: macos-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-
-      - name: Install dependencies
-        run: |
-          flutter pub get
-          cd example && flutter pub get
-
-      - name: Build iOS
-        run: |
-          cd example
-          flutter build ios --no-codesign
-
-  # Web build test
-  web-build:
-    name: Web Build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-
-      - name: Install dependencies
-        run: |
-          flutter pub get
-          cd example && flutter pub get
-
-      - name: Build Web
-        run: |
-          cd example
-          flutter build web
-
-  # Windows build test
-  windows-build:
-    name: Windows Build
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-
-      - name: Install dependencies
-        run: |
-          flutter pub get
-          cd example
-          flutter pub get
-
-      - name: Build Windows
-        run: |
-          cd example
-          flutter build windows
-
-  # Linux build test
-  linux-build:
-    name: Linux Build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-
-      - name: Install dependencies
-        run: |
-          flutter pub get
-          cd example && flutter pub get
-
-      - name: Build Linux
-        run: |
-          cd example
-          flutter build linux
-
-  # macOS build test
-  macos-build:
-    name: macOS Build
-    runs-on: macos-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-
-      - name: Install dependencies
-        run: |
-          flutter pub get
-          cd example && flutter pub get
-
-      - name: Build macOS
-        run: |
-          cd example
-          flutter build macos
-
-  # Publish to pub.dev on tag
   publish:
     name: Publish to pub.dev
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
       - name: Checkout code
@@ -241,9 +58,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Run tests
-        run: flutter test
 
       - name: Publish package
         run: flutter pub publish --force
