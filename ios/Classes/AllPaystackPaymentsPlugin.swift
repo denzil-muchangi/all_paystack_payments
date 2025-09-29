@@ -82,52 +82,46 @@ public class AllPaystackPaymentsPlugin: NSObject, FlutterPlugin {
 
     let reference = args["reference"] as? String ?? UUID().uuidString
 
-    do {
-      let transactionParams = PSTCKTransactionParams()
-      transactionParams.amount = UInt(amount)
-      transactionParams.email = email
-      transactionParams.reference = reference
+    let transactionParams = PSTCKTransactionParams()
+    transactionParams.amount = UInt(amount)
+    transactionParams.email = email
+    transactionParams.reference = reference
 
-      let cardParams = PSTCKCardParams()
-      cardParams.number = number
-      cardParams.expiryMonth = UInt(expiryMonth) ?? 0
-      cardParams.expiryYear = UInt(expiryYear) ?? 0
-      cardParams.cvc = cvv
+    let cardParams = PSTCKCardParams()
+    cardParams.number = number
+    cardParams.expiryMonth = UInt(expiryMonth) ?? 0
+    cardParams.expiryYear = UInt(expiryYear) ?? 0
+    cardParams.cvc = cvv
 
-      if let pin = cardData["pin"] as? String {
-        cardParams.pin = pin
-      }
+    if let pin = cardData["pin"] as? String {
+      cardParams.pin = pin
+    }
 
-      let transaction = PSTCKPaymentTransaction(params: transactionParams, cardParams: cardParams)
+    let transaction = PSTCKPaymentTransaction(params: transactionParams, cardParams: cardParams)
 
-      currentTransaction = transaction
+    currentTransaction = transaction
 
-      transaction.chargeCard(on: viewController) { [weak self] (reference, error) in
-        guard let self = self else { return }
+    transaction.chargeCard(on: viewController) { [weak self] (reference, error) in
+      guard let self = self else { return }
 
-        if let error = error {
-          result(FlutterError(code: "PAYMENT_FAILED", message: error.localizedDescription, details: nil))
-          return
-        }
-
-        if let reference = reference {
-          let response: [String: Any] = [
-            "reference": reference,
-            "status": "success",
-            "amount": amount,
-            "currency": args["currency"] as? String ?? "NGN",
-            "payment_method": "card",
-            "gateway_response": "Payment successful"
-          ]
-          result(response)
-        } else {
-          result(FlutterError(code: "PAYMENT_FAILED", message: "Payment failed with unknown error", details: nil))
-        }
-      } catch {
+      if let error = error {
         result(FlutterError(code: "PAYMENT_FAILED", message: error.localizedDescription, details: nil))
+        return
       }
-    } catch {
-      result(FlutterError(code: "PAYMENT_FAILED", message: "Failed to create payment transaction: \(error.localizedDescription)", details: nil))
+
+      if let reference = reference {
+        let response: [String: Any] = [
+          "reference": reference,
+          "status": "success",
+          "amount": amount,
+          "currency": args["currency"] as? String ?? "NGN",
+          "payment_method": "card",
+          "gateway_response": "Payment successful"
+        ]
+        result(response)
+      } else {
+        result(FlutterError(code: "PAYMENT_FAILED", message: "Payment failed with unknown error", details: nil))
+      }
     }
   }
 
@@ -249,8 +243,8 @@ public class AllPaystackPaymentsPlugin: NSObject, FlutterPlugin {
           "reference": reference,
           "status": status,
           "amount": transaction.amount,
-          "currency": "NGN", // Default, should be configurable
-          "payment_method": "card", // Default, should be determined from transaction
+          "currency": transaction.currency.rawValue, // Use transaction currency
+          "payment_method": transaction.paymentMethod.rawValue, // Use transaction payment method
           "gateway_response": transaction.message ?? "Verification completed"
         ]
         result(response)
@@ -280,8 +274,8 @@ public class AllPaystackPaymentsPlugin: NSObject, FlutterPlugin {
           "reference": reference,
           "status": status,
           "amount": transaction.amount,
-          "currency": "NGN",
-          "payment_method": "card",
+          "currency": transaction.currency.rawValue, // Use transaction currency
+          "payment_method": transaction.paymentMethod.rawValue, // Use transaction payment method
           "gateway_response": transaction.message ?? "Status check completed"
         ]
         result(response)
