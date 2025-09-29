@@ -11,6 +11,24 @@
   "@initializing": {
     "description": "Status message during initialization"
   },
+  "initializationSuccess": "Paystack initialisé avec succès. Prêt à accepter les paiements.",
+  "@initializationSuccess": {
+    "description": "Message for successful Paystack initialization"
+  },
+  "initializationFailed": "Échec de l'initialisation de Paystack : {message}",
+  "@initializationFailed": {
+    "description": "Message for failed Paystack initialization",
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "unexpectedError": "Erreur inattendue: {error}",
+  "@unexpectedError": {
+    "description": "Message for unexpected errors",
+    "placeholders": {
+      "error": {}
+    }
+  },
   "cardPayment": "Paiement par carte",
   "@cardPayment": {
     "description": "Title for card payment dialog"
@@ -79,7 +97,7 @@
   "@payWithBankTransfer": {
     "description": "Button text for bank transfer payment"
   },
-  "payWithMobileMoney": "Payer avec de l'argent mobile",
+  "payWithMobileMoney": "Payer avec Mobile Money",
   "@payWithMobileMoney": {
     "description": "Button text for mobile money payment"
   },
@@ -87,80 +105,134 @@
   "@required": {
     "description": "Validation message for required fields"
   },
+  "currency": "Devise",
+  "@currency": {
+    "description": "Label for currency dropdown"
+  },
+  "initiatingBankTransfer": "Initiation du virement bancaire...",
+  "@initiatingBankTransfer": {
+    "description": "Message shown while initiating bank transfer"
+  },
   "processingCardPayment": "Traitement du paiement par carte...",
   "@processingCardPayment": {
     "description": "Message shown while processing card payment"
   },
-  "paymentStatus": "Paiement {status}: {response}",
+  "paymentStatus": "Paiement {status}: {gatewayResponse}",
   "@paymentStatus": {
     "description": "Payment status message with placeholders",
     "placeholders": {
-      "status": {
-        "type": "String"
-      },
-      "response": {
-        "type": "String"
-      }
+      "status": {},
+      "gatewayResponse": {}
     }
   },
   "paymentFailed": "Échec du paiement: {message}",
   "@paymentFailed": {
     "description": "Payment failure message with placeholder",
     "placeholders": {
-      "message": {
-        "type": "String"
-      }
+      "message": {}
     }
   },
-  "unexpectedError": "Erreur inattendue: {error}",
-  "@unexpectedError": {
-    "description": "Unexpected error message with placeholder",
+  "invalidCardDetails": "Détails de carte invalides: {message}",
+  "@invalidCardDetails": {
+    "description": "Invalid card details message with placeholder",
     "placeholders": {
-      "error": {
-        "type": "String"
-      }
+      "message": {}
     }
   },
-  "initiatingBankTransfer": "Initiation du virement bancaire...",
-  "@initiatingBankTransfer": {
-    "description": "Message shown while initiating bank transfer"
-  },
-  "transferStatus": "Transfert {status}: {response}",
+  "transferStatus": "Transfert {status}: {gatewayResponse}",
   "@transferStatus": {
     "description": "Transfer status message with placeholders",
     "placeholders": {
-      "status": {
-        "type": "String"
-      },
-      "response": {
-        "type": "String"
-      }
+      "status": {},
+      "gatewayResponse": {}
     }
   },
   "transferFailed": "Échec du transfert: {message}",
   "@transferFailed": {
     "description": "Transfer failure message with placeholder",
     "placeholders": {
-      "message": {
-        "type": "String"
-      }
+      "message": {}
     }
   },
   "processingMobileMoney": "Traitement du paiement mobile...",
   "@processingMobileMoney": {
     "description": "Message shown while processing mobile money payment"
   },
-  "paystackInitialized": "Paystack initialisé avec succès",
-  "@paystackInitialized": {
-    "description": "Success message for Paystack initialization"
+  "onlyMpesaSupported": "Seul M-Pesa est pris en charge pour le Kenya",
+  "@onlyMpesaSupported": {
+    "description": "Message indicating only M-Pesa is supported"
   },
-  "paystackInitFailed": "Échec de l'initialisation de Paystack: {error}",
-  "@paystackInitFailed": {
-    "description": "Failure message for Paystack initialization with placeholder",
+  "verifyPayment": "Vérifier le paiement",
+  "@verifyPayment": {
+    "description": "Title for verify payment dialog"
+  },
+  "reference": "Référence",
+  "@reference": {
+    "description": "Label for reference input field"
+  },
+  "verify": "Vérifier",
+  "@verify": {
+    "description": "Verify button text"
+  },
+  "verifyingPayment": "Vérification du paiement...",
+  "@verifyingPayment": {
+    "description": "Message shown while verifying payment"
+  },
+  "verificationFailed": "Échec de la vérification du paiement: {message}",
+  "@verificationFailed": {
+    "description": "Payment verification failure message with placeholder",
     "placeholders": {
-      "error": {
-        "type": "String"
-      }
+      "message": {}
     }
+  },
+  "getPaymentStatus": "Obtenir le statut du paiement",
+  "@getPaymentStatus": {
+    "description": "Title for get payment status dialog"
+  },
+  "getStatus": "Obtenir le statut",
+  "@getStatus": {
+    "description": "Get Status button text"
+  },
+  "gettingPaymentStatus": "Obtention du statut du paiement...",
+  "@gettingPaymentStatus": {
+    "description": "Message shown while getting payment status"
+  },
+  "getStatusFailed": "Échec de l'obtention du statut: {message}",
+  "@getStatusFailed": {
+    "description": "Get status failure message with placeholder",
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "cancelPayment": "Annuler le paiement",
+  "@cancelPayment": {
+    "description": "Title for cancel payment dialog"
+  },
+  "cancellingPayment": "Annulation du paiement...",
+  "@cancellingPayment": {
+    "description": "Message shown while cancelling payment"
+  },
+  "paymentCancelledSuccessfully": "Paiement annulé avec succès.",
+  "@paymentCancelledSuccessfully": {
+    "description": "Message for successful payment cancellation"
+  },
+  "paymentCancellationFailed": "Échec de l'annulation du paiement.",
+  "@paymentCancellationFailed": {
+    "description": "Message for failed payment cancellation"
+  },
+  "cancellationFailed": "Échec de l'annulation: {message}",
+  "@cancellationFailed": {
+    "description": "Cancellation failure message with placeholder",
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "invalidCardNumber": "Numéro de carte invalide",
+  "@invalidCardNumber": {
+    "description": "Error message for invalid card number"
+  },
+  "invalidPhoneNumber": "Numéro de téléphone invalide (inclure le code pays)",
+  "@invalidPhoneNumber": {
+    "description": "Error message for invalid phone number"
   }
 }

@@ -65,11 +65,10 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    AllPaystackPayments allPaystackPaymentsPlugin = AllPaystackPayments();
     MockAllPaystackPaymentsPlatform fakePlatform =
         MockAllPaystackPaymentsPlatform();
     AllPaystackPaymentsPlatform.instance = fakePlatform;
 
-    expect(await allPaystackPaymentsPlugin.getPlatformVersion(), '42');
+    expect(await AllPaystackPayments.getPlatformVersion(), '42');
   });
 }

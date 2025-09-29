@@ -113,6 +113,24 @@ abstract class AppLocalizations {
   /// **'Initializing...'**
   String get initializing;
 
+  /// Message for successful Paystack initialization
+  ///
+  /// In en, this message translates to:
+  /// **'Paystack initialized successfully. Ready to accept payments.'**
+  String get initializationSuccess;
+
+  /// Message for failed Paystack initialization
+  ///
+  /// In en, this message translates to:
+  /// **'Paystack initialization failed: {message}'**
+  String initializationFailed(Object message);
+
+  /// Message for unexpected errors
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred: {error}'**
+  String unexpectedError(Object error);
+
   /// Title for card payment dialog
   ///
   /// In en, this message translates to:
@@ -140,8 +158,14 @@ abstract class AppLocalizations {
   /// Label for amount input field in kobo
   ///
   /// In en, this message translates to:
-  /// **'Amount (kobo)'**
+  /// **'Amount (in kobo)'**
   String get amountKobo;
+
+  /// Validation message for required fields
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get required;
 
   /// Label for card number input field
   ///
@@ -152,13 +176,13 @@ abstract class AppLocalizations {
   /// Label for expiry month input field
   ///
   /// In en, this message translates to:
-  /// **'Expiry Month (MM)'**
+  /// **'Expiry Month'**
   String get expiryMonth;
 
   /// Label for expiry year input field
   ///
   /// In en, this message translates to:
-  /// **'Expiry Year (YY)'**
+  /// **'Expiry Year'**
   String get expiryYear;
 
   /// Label for CVV input field
@@ -173,6 +197,54 @@ abstract class AppLocalizations {
   /// **'Card Holder Name'**
   String get cardHolderName;
 
+  /// Pay button text
+  ///
+  /// In en, this message translates to:
+  /// **'Pay'**
+  String get pay;
+
+  /// Message shown while processing card payment
+  ///
+  /// In en, this message translates to:
+  /// **'Processing card payment...'**
+  String get processingCardPayment;
+
+  /// Payment status message with placeholders
+  ///
+  /// In en, this message translates to:
+  /// **'Payment {status}: {gatewayResponse}'**
+  String paymentStatus(Object status, Object gatewayResponse);
+
+  /// Payment failure message with placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Payment failed: {message}'**
+  String paymentFailed(Object message);
+
+  /// Invalid card details message with placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid card details: {message}'**
+  String invalidCardDetails(Object message);
+
+  /// Message shown while initiating bank transfer
+  ///
+  /// In en, this message translates to:
+  /// **'Initiating bank transfer...'**
+  String get initiatingBankTransfer;
+
+  /// Transfer status message with placeholders
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer {status}: {gatewayResponse}'**
+  String transferStatus(Object status, Object gatewayResponse);
+
+  /// Transfer failure message with placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Bank transfer failed: {message}'**
+  String transferFailed(Object message);
+
   /// Label for phone number input field
   ///
   /// In en, this message translates to:
@@ -185,23 +257,101 @@ abstract class AppLocalizations {
   /// **'Provider'**
   String get provider;
 
-  /// Cancel button text
+  /// Message shown while processing mobile money payment
   ///
   /// In en, this message translates to:
-  /// **'Cancel'**
-  String get cancel;
+  /// **'Processing mobile money payment...'**
+  String get processingMobileMoney;
 
-  /// Pay button text
+  /// Message indicating only M-Pesa is supported
   ///
   /// In en, this message translates to:
-  /// **'Pay'**
-  String get pay;
+  /// **'Only M-Pesa supported for Kenya'**
+  String get onlyMpesaSupported;
 
-  /// Initiate transfer button text
+  /// Title for verify payment dialog
   ///
   /// In en, this message translates to:
-  /// **'Initiate Transfer'**
-  String get initiateTransfer;
+  /// **'Verify Payment'**
+  String get verifyPayment;
+
+  /// Label for reference input field
+  ///
+  /// In en, this message translates to:
+  /// **'Reference'**
+  String get reference;
+
+  /// Verify button text
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verify;
+
+  /// Message shown while verifying payment
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying payment...'**
+  String get verifyingPayment;
+
+  /// Payment verification failure message with placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Payment verification failed: {message}'**
+  String verificationFailed(Object message);
+
+  /// Title for get payment status dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Get Payment Status'**
+  String get getPaymentStatus;
+
+  /// Get Status button text
+  ///
+  /// In en, this message translates to:
+  /// **'Get Status'**
+  String get getStatus;
+
+  /// Message shown while getting payment status
+  ///
+  /// In en, this message translates to:
+  /// **'Getting payment status...'**
+  String get gettingPaymentStatus;
+
+  /// Get status failure message with placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to get payment status: {message}'**
+  String getStatusFailed(Object message);
+
+  /// Title for cancel payment dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Payment'**
+  String get cancelPayment;
+
+  /// Message shown while cancelling payment
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelling payment...'**
+  String get cancellingPayment;
+
+  /// Message for successful payment cancellation
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancelled successfully.'**
+  String get paymentCancelledSuccessfully;
+
+  /// Message for failed payment cancellation
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancellation failed.'**
+  String get paymentCancellationFailed;
+
+  /// Cancellation failure message with placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancellation failed: {message}'**
+  String cancellationFailed(Object message);
 
   /// Button text for card payment
   ///
@@ -221,71 +371,35 @@ abstract class AppLocalizations {
   /// **'Pay with Mobile Money'**
   String get payWithMobileMoney;
 
-  /// Validation message for required fields
+  /// Initiate transfer button text
   ///
   /// In en, this message translates to:
-  /// **'Required'**
-  String get required;
+  /// **'Initiate Transfer'**
+  String get initiateTransfer;
 
-  /// Message shown while processing card payment
+  /// Label for currency dropdown
   ///
   /// In en, this message translates to:
-  /// **'Processing card payment...'**
-  String get processingCardPayment;
+  /// **'Currency'**
+  String get currency;
 
-  /// Payment status message with placeholders
+  /// Cancel button text
   ///
   /// In en, this message translates to:
-  /// **'Payment {status}: {response}'**
-  String paymentStatus(String status, String response);
+  /// **'Cancel'**
+  String get cancel;
 
-  /// Payment failure message with placeholder
+  /// Error message for invalid card number
   ///
   /// In en, this message translates to:
-  /// **'Payment failed: {message}'**
-  String paymentFailed(String message);
+  /// **'Invalid card number'**
+  String get invalidCardNumber;
 
-  /// Unexpected error message with placeholder
+  /// Error message for invalid phone number
   ///
   /// In en, this message translates to:
-  /// **'Unexpected error: {error}'**
-  String unexpectedError(String error);
-
-  /// Message shown while initiating bank transfer
-  ///
-  /// In en, this message translates to:
-  /// **'Initiating bank transfer...'**
-  String get initiatingBankTransfer;
-
-  /// Transfer status message with placeholders
-  ///
-  /// In en, this message translates to:
-  /// **'Transfer {status}: {response}'**
-  String transferStatus(String status, String response);
-
-  /// Transfer failure message with placeholder
-  ///
-  /// In en, this message translates to:
-  /// **'Transfer failed: {message}'**
-  String transferFailed(String message);
-
-  /// Message shown while processing mobile money payment
-  ///
-  /// In en, this message translates to:
-  /// **'Processing mobile money payment...'**
-  String get processingMobileMoney;
-
-  /// Success message for Paystack initialization
-  ///
-  /// In en, this message translates to:
-  /// **'Paystack initialized successfully'**
-  String get paystackInitialized;
-
-  /// Failure message for Paystack initialization with placeholder
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to initialize Paystack: {error}'**
-  String paystackInitFailed(String error);
+  /// **'Invalid phone number (include country code)'**
+  String get invalidPhoneNumber;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

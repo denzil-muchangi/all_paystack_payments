@@ -35,10 +35,12 @@ class AllPaystackPayments {
     String? pin,
     Map<String, dynamic>? metadata,
     String? callbackUrl,
+    Currency currency =
+        Currency.ngn, // Make currency configurable, default to NGN
   }) {
     final request = CardPaymentRequest(
       amount: amount,
-      currency: Currency.ngn, // Default to NGN, can be made configurable
+      currency: currency,
       email: email,
       reference: reference,
       cardNumber: cardNumber,
@@ -60,10 +62,12 @@ class AllPaystackPayments {
     String? reference,
     Map<String, dynamic>? metadata,
     String? callbackUrl,
+    Currency currency =
+        Currency.ngn, // Make currency configurable, default to NGN
   }) {
     final request = BankTransferRequest(
       amount: amount,
-      currency: Currency.ngn,
+      currency: currency,
       email: email,
       reference: reference,
       metadata: metadata,
@@ -81,10 +85,12 @@ class AllPaystackPayments {
     String? reference,
     Map<String, dynamic>? metadata,
     String? callbackUrl,
+    Currency currency =
+        Currency.ngn, // Make currency configurable, default to NGN
   }) {
     final request = MobileMoneyRequest(
       amount: amount,
-      currency: Currency.ngn,
+      currency: currency,
       email: email,
       reference: reference,
       provider: provider,
@@ -115,8 +121,8 @@ class AllPaystackPayments {
     return AllPaystackPaymentsPlatform.instance.cancelPayment(reference);
   }
 
-  /// Get platform version (legacy method for backward compatibility)
-  Future<String?> getPlatformVersion() {
+  /// For backward compatibility.
+  static Future<String?> getPlatformVersion() async {
     return AllPaystackPaymentsPlatform.instance.getPlatformVersion();
   }
 }
