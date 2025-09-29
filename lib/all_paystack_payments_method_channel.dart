@@ -110,6 +110,35 @@ class MethodChannelAllPaystackPayments extends AllPaystackPaymentsPlatform {
   }
 
   @override
+  Future<String> getCheckoutUrl(PaymentRequest request) async {
+    try {
+      request.validate();
+      final result = await methodChannel.invokeMethod<Map<dynamic, dynamic>>(
+        'getCheckoutUrl',
+        request.toJson(),
+      );
+      if (result == null) {
+        throw PaystackError(message: 'No response from checkout URL request');
+      }
+      final castedResult = result.cast<String, dynamic>();
+      if (castedResult['status'] != 'success') {
+        throw PaystackError.fromApiResponse(castedResult);
+      }
+      final data = castedResult['data'] as Map<String, dynamic>;
+      final checkoutUrl = data['authorization_url'] as String?;
+      if (checkoutUrl == null) {
+        throw PaystackError(message: 'No checkout URL in response');
+      }
+      return checkoutUrl;
+    } on PlatformException catch (e) {
+      throw PaystackError(
+        message: e.message ?? 'Failed to get checkout URL',
+        code: e.code,
+      );
+    }
+  }
+
+  @override
   Future<String?> getPlatformVersion() async {
     final version = await methodChannel.invokeMethod<String>(
       'getPlatformVersion',

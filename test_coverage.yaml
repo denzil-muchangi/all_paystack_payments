@@ -1,0 +1,32 @@
+# Test coverage configuration
+# Minimum coverage threshold
+min_coverage: 80
+
+# Exclude files from coverage
+exclude:
+  - 'lib/*.g.dart'
+  - 'lib/**/*.freezed.dart'
+  - 'test/**'
+  - 'example/**'
+  - 'android/**'
+  - 'ios/**'
+  - 'linux/**'
+  - 'macos/**'
+  - 'windows/**'
+  - 'web/**'
+
+# Include files for coverage
+include:
+  - 'lib/**'
+
+# Coverage report format
+format: lcov
+
+# Output directory for coverage reports
+output: coverage/
+
+# HTML report generation
+html: true
+
+# Branch coverage
+branch: true

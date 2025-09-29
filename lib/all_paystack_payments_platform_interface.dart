@@ -36,6 +36,14 @@ abstract class AllPaystackPaymentsPlatform extends PlatformInterface {
     throw UnimplementedError('initializePayment() has not been implemented.');
   }
 
+  /// Get checkout URL for a payment transaction
+  ///
+  /// This method initializes a transaction with Paystack and returns the checkout URL
+  /// that can be opened in a webview for payment processing.
+  Future<String> getCheckoutUrl(PaymentRequest request) {
+    throw UnimplementedError('getCheckoutUrl() has not been implemented.');
+  }
+
   /// Verify a payment transaction
   Future<PaymentResponse> verifyPayment(String reference) {
     throw UnimplementedError('verifyPayment() has not been implemented.');

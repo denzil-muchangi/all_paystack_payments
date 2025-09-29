@@ -1,6 +1,32 @@
 import 'enums.dart';
 
-/// Response from a payment operation
+/// Response from a payment operation.
+///
+/// This class encapsulates the result of any payment-related operation, including
+/// payment initiation, verification, and status checks. It provides a unified interface
+/// for handling payment responses across all payment methods.
+///
+/// ## Properties
+/// - [reference]: Unique transaction reference
+/// - [status]: Current payment status ([PaymentStatus])
+/// - [amount]: Transaction amount in kobo (smallest currency unit)
+/// - [currency]: Transaction currency
+/// - [paymentMethod]: Payment method used
+/// - [gatewayResponse]: Human-readable response message from Paystack
+/// - [rawResponse]: Complete raw response data from Paystack API
+/// - [createdAt]: Timestamp when the transaction was created
+///
+/// ## Example
+/// ```dart
+/// final response = await AllPaystackPayments.initializeCardPayment(...);
+///
+/// if (response.isSuccessful) {
+///   print('Payment successful: ${response.reference}');
+///   print('Amount: ₦${response.amount / 100}');
+/// } else {
+///   print('Payment failed: ${response.gatewayResponse}');
+/// }
+/// ```
 class PaymentResponse {
   /// Unique transaction reference
   final String reference;
@@ -37,7 +63,16 @@ class PaymentResponse {
     this.createdAt,
   });
 
-  /// Factory method to create response from API data
+  /// Factory method to create response from API data.
+  ///
+  /// Creates a [PaymentResponse] instance from raw Paystack API response data.
+  /// This method handles parsing and type conversion of API response fields.
+  ///
+  /// ## Parameters
+  /// - [response]: Raw response map from Paystack API
+  ///
+  /// ## Returns
+  /// A new [PaymentResponse] instance with parsed data.
   factory PaymentResponse.fromApiResponse(Map<String, dynamic> response) {
     return PaymentResponse(
       reference: response['reference'] as String? ?? '',
@@ -92,13 +127,20 @@ class PaymentResponse {
     }
   }
 
-  /// Check if payment was successful
+  /// Check if payment was successful.
+  ///
+  /// Returns `true` if the payment status is [PaymentStatus.success].
   bool get isSuccessful => status == PaymentStatus.success;
 
-  /// Check if payment is pending
+  /// Check if payment is pending.
+  ///
+  /// Returns `true` if the payment status is [PaymentStatus.pending].
+  /// Pending payments may still complete or fail.
   bool get isPending => status == PaymentStatus.pending;
 
-  /// Check if payment failed
+  /// Check if payment failed.
+  ///
+  /// Returns `true` if the payment status is [PaymentStatus.failed].
   bool get isFailed => status == PaymentStatus.failed;
 
   @override

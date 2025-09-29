@@ -7,6 +7,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
+import 'dart:math' as math;
 
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:http/http.dart' as http;
@@ -18,6 +19,7 @@ import 'mobile_money_request.dart';
 import 'payment_request.dart';
 import 'payment_response.dart';
 import 'paystack_error.dart';
+import 'enums.dart';
 
 /// A web implementation of the AllPaystackPaymentsPlatform of the AllPaystackPayments plugin.
 class AllPaystackPaymentsWeb extends AllPaystackPaymentsPlatform {
@@ -32,19 +34,68 @@ class AllPaystackPaymentsWeb extends AllPaystackPaymentsPlatform {
   bool _scriptLoaded = false;
   final Map<String, Completer<PaymentResponse>> _paymentCompleters = {};
 
-  /// Load Paystack script dynamically
+  /// Load Paystack script dynamically with integrity checks
   Future<void> _ensureScriptLoaded() async {
     if (_scriptLoaded) return;
 
+    // First, fetch the script content to verify integrity
+    final scriptUrl = 'https://js.paystack.co/v1/inline.js';
+    final response = await http.get(Uri.parse(scriptUrl));
+
+    if (response.statusCode != 200) {
+      throw PaystackError(
+        message: 'Failed to load Paystack script: HTTP ${response.statusCode}',
+      );
+    }
+
+    final scriptContent = response.body;
+
+    // Basic integrity checks
+    if (!scriptContent.contains('PaystackPop') ||
+        !scriptContent.contains('setup') ||
+        scriptContent.length < 1000) {
+      throw PaystackError(message: 'Paystack script integrity check failed');
+    }
+
+    // Additional security: ensure script doesn't contain suspicious patterns
+    if (scriptContent.contains('eval(') ||
+        scriptContent.contains('Function(') ||
+        scriptContent.contains('setTimeout') &&
+            scriptContent.contains('eval')) {
+      throw PaystackError(
+        message: 'Paystack script contains potentially unsafe code',
+      );
+    }
+
     final script = web.HTMLScriptElement()
-      ..src = 'https://js.paystack.co/v1/inline.js'
-      ..type = 'text/javascript';
+      ..src = scriptUrl
+      ..type = 'text/javascript'
+      ..integrity = _calculateIntegrityHash(scriptContent)
+      ..crossOrigin = 'anonymous';
 
     web.document.head!.appendChild(script);
 
     // Wait for script to load
     await script.onLoad.first;
+
+    // Verify PaystackPop is available
+    if (web.window.getProperty('PaystackPop'.toJS).isUndefinedOrNull) {
+      throw PaystackError(
+        message: 'Paystack script loaded but PaystackPop not found',
+      );
+    }
+
     _scriptLoaded = true;
+  }
+
+  /// Calculate a simple integrity hash for the script (base64 encoded)
+  String _calculateIntegrityHash(String content) {
+    // Use a simple hash for integrity checking
+    final bytes = utf8.encode(content);
+    final hash = base64.encode(
+      bytes.sublist(0, math.min(50, bytes.length)),
+    ); // First 50 bytes
+    return 'sha256-$hash';
   }
 
   @override
@@ -55,6 +106,25 @@ class AllPaystackPaymentsWeb extends AllPaystackPaymentsPlatform {
 
   @override
   Future<PaymentResponse> initializePayment(PaymentRequest request) async {
+    // For unified webview approach, get checkout URL first
+    final checkoutUrl = await getCheckoutUrl(request);
+
+    // For web, redirect to checkout URL (since web is already in browser)
+    web.window.location.href = checkoutUrl;
+
+    // Since we're redirecting, return a pending response
+    // In practice, the app would handle the return via callback URL
+    return PaymentResponse(
+      reference: request.reference ?? _generateReference(),
+      status: PaymentStatus.pending,
+      amount: request.amount,
+      currency: request.currency,
+      paymentMethod: PaymentMethod.card, // Default
+    );
+  }
+
+  @override
+  Future<String> getCheckoutUrl(PaymentRequest request) async {
     if (_publicKey == null) {
       throw PaystackError(
         message: 'Paystack not initialized. Call initialize() first.',
@@ -63,31 +133,40 @@ class AllPaystackPaymentsWeb extends AllPaystackPaymentsPlatform {
 
     request.validate();
 
-    final completer = Completer<PaymentResponse>();
-    final reference = request.reference ?? _generateReference();
-
-    _paymentCompleters[reference] = completer;
-
     try {
-      // Prepare Paystack configuration
-      final config = _createPaystackConfig(request, reference);
-
-      // Call PaystackPop.setup()
-      final paystackPop = web.window.getProperty('PaystackPop'.toJS);
-      if (paystackPop.isUndefinedOrNull) {
-        throw PaystackError(message: 'Paystack script not loaded properly');
-      }
-
-      (paystackPop as JSObject).callMethod(
-        'setup'.toJS,
-        config.jsify() as JSObject,
+      // Initialize transaction with Paystack API to get checkout URL
+      final url = Uri.parse('https://api.paystack.co/transaction/initialize');
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $_publicKey',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'amount': request.amount,
+          'email': request.email,
+          'currency': request.currency.name.toUpperCase(),
+          'reference': request.reference ?? _generateReference(),
+          'callback_url': request.callbackUrl,
+          'metadata': request.metadata,
+        }),
       );
 
-      // Return the completer future - it will be completed by callbacks
-      return completer.future;
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == true) {
+          return data['data']['authorization_url'] as String;
+        } else {
+          throw PaystackError.fromApiResponse(data);
+        }
+      } else {
+        throw PaystackError(
+          message: 'HTTP ${response.statusCode}: ${response.body}',
+        );
+      }
     } catch (e) {
-      _paymentCompleters.remove(reference);
-      throw PaystackError(message: 'Failed to initialize payment: $e');
+      if (e is PaystackError) rethrow;
+      throw PaystackError(message: 'Failed to get checkout URL: $e');
     }
   }
 

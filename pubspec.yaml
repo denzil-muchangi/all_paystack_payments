@@ -24,11 +24,18 @@ dependencies:
   web: ^1.0.0
   plugin_platform_interface: ^2.0.2
   http: ^1.2.0
+  webview_flutter: ^4.8.0
+  # Desktop webview support (may need to be added based on available packages)
+  # webview_windows: ^0.2.0
+  # webview_macos: ^0.1.0
+  # webview_linux: ^0.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  mockito: ^5.4.4
+  build_runner: ^2.4.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -92,3 +99,12 @@ flutter:
   #
   # For details regarding fonts in packages, see
   # https://flutter.dev/to/font-from-package
+
+scripts:
+ test: flutter test
+ test:coverage: flutter test --coverage
+ test:unit: flutter test test/ --exclude-tags integration
+ test:integration: flutter test test/ --tags integration
+ analyze: flutter analyze
+ format: flutter format .
+ clean: flutter clean && flutter pub get

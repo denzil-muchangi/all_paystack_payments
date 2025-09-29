@@ -28,6 +28,7 @@ class AllPaystackPaymentsPlugin : public flutter::Plugin {
 
  private:
   std::string public_key_;
+  std::string MakeHttpPostRequest(const std::string& url, const std::string& json_body, const std::string& public_key);
 };
 
 }  // namespace all_paystack_payments
